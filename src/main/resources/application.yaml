@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8888/realms/my-realm
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: my-app
+            client-secret: my-app
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - profile
+              - email
+          http-bin:
+            provider: keycloak
+            client-id: my-app
+            client-secret: my-app
+            authorization-grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+#            scope:
+#              - resource-request.read
+#              - lir:*
+
+logging:
+  level:
+    org.springframework.security: debug
+    org.springframework.web: debug
+    org.apache.http: debug
+    org.apache.hc.client5: debug

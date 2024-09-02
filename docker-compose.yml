@@ -1,0 +1,63 @@
+services:
+
+  keycloak:
+    image: bitnami/keycloak:25.0.4
+    environment:
+      KEYCLOAK_DATABASE_HOST: postgresql
+      KEYCLOAK_DATABASE_NAME: ${KEYCLOAK_DATABASE_NAME}
+      KEYCLOAK_DATABASE_USER: ${KEYCLOAK_DATABASE_USER}
+      KEYCLOAK_ADMIN_USER: ${KEYCLOAK_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_EXTRA_ARGS: >-
+        --features=recovery-codes,token-exchange,admin-fine-grained-authz,dynamic-scopes
+        --health-enabled=true
+        --metrics-enabled=true
+      KEYCLOAK_EXTRA_ARGS_PREPENDED: >-
+        --verbose
+#      KEYCLOAK_PRODUCTION: true
+#      KEYCLOAK_PROXY_HEADERS: xforwarded
+#      KEYCLOAK_ENABLE_HTTPS: false
+#      KC_HOSTNAME: https://idp.virtualenv.ripe.net
+#      KC_HOSTNAME_ADMIN: https://keycloak.virtualenv.ripe.net
+#      KC_HOSTNAME_STRICT: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/realms/master/"]
+    ports:
+      - "8888:8080"
+    depends_on:
+      postgresql:
+        condition: service_started
+
+  keycloak-config:
+    image: docker-registry.ripe.net/swe/ripe-keycloak:24.0.5@sha256:d1c59e0b89b38669803db2f804dba71c6d21f1d77c3f51b8e8283d31b67c8c9b
+    environment:
+      KEYCLOAK_API_URL: http://keycloak:8080
+      ADMIN_USER: ${KEYCLOAK_ADMIN_USER}
+      ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    entrypoint: /bin/bash
+    working_dir: /scripts
+    command:
+      - ./configure-keycloak.sh
+    dns_search: .
+    volumes:
+      - ./configure-keycloak.sh:/scripts/configure-keycloak.sh:ro
+      - ./keycloak-users.json:/scripts/keycloak-users.json:ro
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: on-failure
+
+  postgresql:
+    image: bitnami/postgresql:15.8.0
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_DATABASE=${KEYCLOAK_DATABASE_NAME}
+      - POSTGRESQL_USERNAME=${KEYCLOAK_DATABASE_USER}
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgresql-data:/bitnami/postgresql"
+
+volumes:
+  postgresql-data:
+    driver: local

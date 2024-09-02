@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": "67a979be-e17b-4769-80ad-0e53a5e6805f",
+      "createdTimestamp": 1668517424244,
+      "username": "user@example.com",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "firstName": "A",
+      "lastName": "User",
+      "email": "user@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user@example.com"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-my-realm"
+      ],
+      "notBefore": 0,
+      "groups": []
+    }
+  ]
+}
