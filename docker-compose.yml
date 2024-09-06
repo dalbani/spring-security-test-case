@@ -14,12 +14,6 @@ services:
         --metrics-enabled=true
       KEYCLOAK_EXTRA_ARGS_PREPENDED: >-
         --verbose
-#      KEYCLOAK_PRODUCTION: true
-#      KEYCLOAK_PROXY_HEADERS: xforwarded
-#      KEYCLOAK_ENABLE_HTTPS: false
-#      KC_HOSTNAME: https://idp.virtualenv.ripe.net
-#      KC_HOSTNAME_ADMIN: https://keycloak.virtualenv.ripe.net
-#      KC_HOSTNAME_STRICT: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/realms/master/"]
     ports:
