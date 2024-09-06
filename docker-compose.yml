@@ -23,7 +23,7 @@ services:
         condition: service_started
 
   keycloak-config:
-    image: docker-registry.ripe.net/swe/ripe-keycloak:24.0.5@sha256:d1c59e0b89b38669803db2f804dba71c6d21f1d77c3f51b8e8283d31b67c8c9b
+    image: bitnami/keycloak:25.0.4
     environment:
       KEYCLOAK_API_URL: http://keycloak:8080
       ADMIN_USER: ${KEYCLOAK_ADMIN_USER}
