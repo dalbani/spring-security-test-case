@@ -1,10 +1,7 @@
 package com.example;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +15,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.client.endpoint.RestClientTokenExchangeTokenResponseClient;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
@@ -38,8 +36,6 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @EnableMethodSecurity
 public class Config {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
-
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     public Config(ClientRegistrationRepository clientRegistrationRepository) {
@@ -53,13 +49,16 @@ public class Config {
 
     @Bean
     public OAuth2AuthorizedClientProvider tokenExchangeOAuth2AuthorizedClientProvider(
-            @Lazy OAuth2AuthorizedClientManager authorizedClientManager) {
+            OAuth2AuthorizedClientRepository authorizedClientRepository) {
         RestClientTokenExchangeTokenResponseClient tokenResponseClient = new RestClientTokenExchangeTokenResponseClient();
         tokenResponseClient.addParametersConverter(grantRequest -> {
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
             parameters.add(OAuth2ParameterNames.AUDIENCE, grantRequest.getClientRegistration().getRegistrationId());
             return parameters;
         });
+
+        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+                new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientRepository);
 
         TokenExchangeOAuth2AuthorizedClientProvider authorizedClientProvider = new TokenExchangeOAuth2AuthorizedClientProvider();
 
