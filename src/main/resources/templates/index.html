@@ -27,33 +27,8 @@
 
         <hr>
 
-        <h2>Claims in ID Token from OIDC authentication</h2>
+        <h2>Response from <em>httpbing.org/headers</em></h2>
 
-        <dl>
-            <div th:remove="tag" th:each="claim : ${oidcIdToken.getClaims()}">
-                <dt th:text="${claim.key}"></dt>
-                <dd th:text="${claim.value}"></dd>
-            </div>
-        </dl>
-
-        <h3>Raw token value</h3>
-
-        <textarea readonly th:text="${oidcIdToken.getTokenValue()}"></textarea>
-
-        <hr>
-
-        <h2>Claims in Access Token from OIDC authentication</h2>
-
-        <dl>
-            <div th:remove="tag"
-                 th:each="claim : ${T(com.nimbusds.jose.JWSObject).parse(oidcAccessToken.getTokenValue()).getPayload().toJSONObject()}">
-                <dt th:text="${claim.key}"></dt>
-                <dd th:text="${claim.value}"></dd>
-            </div>
-        </dl>
-
-        <h3>Raw token value</h3>
-
-        <textarea readonly th:text="${oidcAccessToken.getTokenValue()}"></textarea>
+        <pre th:text="${httpBinResponse}"></pre>
     </body>
 </html>

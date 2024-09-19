@@ -23,9 +23,6 @@ spring:
             client-id: my-app
             client-secret: my-app
             authorization-grant-type: urn:ietf:params:oauth:grant-type:token-exchange
-#            scope:
-#              - resource-request.read
-#              - lir:*
 
 logging:
   level:

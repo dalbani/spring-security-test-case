@@ -3,7 +3,6 @@ package com.example;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -13,10 +12,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.List;
-import java.util.Objects;
+import org.springframework.web.client.RestClient;
 
 @Controller
 public class WebController {
@@ -25,12 +21,12 @@ public class WebController {
 
     private final OAuth2AuthorizedClientRepository authorizedClientRepository;
 
-    private final WebClient httpBinServicesWebClient;
+    private final RestClient httpBinRestClient;
 
     public WebController(OAuth2AuthorizedClientRepository authorizedClientRepository,
-                             WebClient httpBinServicesWebClient) {
-        this.httpBinServicesWebClient = httpBinServicesWebClient;
+                         RestClient httpBinRestClient) {
         this.authorizedClientRepository = authorizedClientRepository;
+        this.httpBinRestClient = httpBinRestClient;
     }
 
     @RequestMapping("/")
@@ -42,11 +38,12 @@ public class WebController {
             model.addAttribute("oidcIdToken", oidcUser.getIdToken());
             model.addAttribute("oidcAccessToken", getAccessToken(oauth2AuthenticationToken, httpServletRequest));
 
-            httpBinServicesWebClient
+            ResponseEntity<String> responseEntity = httpBinRestClient
                     .get()
+                    .uri("/headers")
                     .retrieve()
-                    .toBodilessEntity()
-                    .block();
+                    .toEntity(String.class);
+            model.addAttribute("httpBinResponse", responseEntity.getBody());
         }
 
         return "index";
